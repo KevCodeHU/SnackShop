@@ -30,7 +30,20 @@ A megvalósítás során az adatbázis absztrakciót úgy építem fel (Prisma s
 /frontend -> React alkalmazás
 /backend -> Node.js alapú API szerver
     /prisma
+        client.js
+        schema.prisma
+    /src
+        /controllers
+            felhasznaloController.js
+            rendelesController.js
+            termekController.js
+        /routes
+            felhasznaloRoutes.js
+            rendelesRoutes.js
+            termekRoutes.js
+        server.js
     .env
+    db-setup.sql
 /sreenshots -> UI képernyőfotók
 README.md -> Projekt dokumentáció (jelenleg ezt olvassa)
 

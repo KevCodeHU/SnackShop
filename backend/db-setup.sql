@@ -1,0 +1,38 @@
+CREATE DATABASE IF NOT EXISTS snackshopdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'snackshop-user'@'localhost' IDENTIFIED BY 'admin123';
+GRANT ALL PRIVILEGES ON snackshopdb.* TO 'snackshop-user'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Prisma hiba esetén:
+CREATE TABLE IF NOT EXISTS Felhasznalo (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  felhasznaloNev VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  jelszo VARCHAR(255) NOT NULL,
+  adminE BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS Termek (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nev VARCHAR(255) NOT NULL,
+  ar FLOAT NOT NULL,
+  keszlet INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Rendeles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  letrehozva DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  felhasznaloId INT NOT NULL,
+  osszeg FLOAT NOT NULL,
+  CONSTRAINT fk_rendeles_felhasznalo FOREIGN KEY (felhasznaloId) REFERENCES Felhasznalo(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS RendelesTetel (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  rendelesId INT NOT NULL,
+  termekId INT NOT NULL,
+  mennyiseg INT NOT NULL,
+  ar FLOAT NOT NULL,
+  CONSTRAINT fk_rendelestetel_rendeles FOREIGN KEY (rendelesId) REFERENCES Rendeles(id) ON DELETE CASCADE,
+  CONSTRAINT fk_rendelestetel_termek FOREIGN KEY (termekId) REFERENCES Termek(id) ON DELETE RESTRICT
+);

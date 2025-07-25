@@ -12,6 +12,8 @@
   "license": "MIT",
   "description": "A SnackShop backend API, amely kezeli a felhasználók snackrendeléseit, az adminisztrátor termék-, ár- és készletkezelését, valamint a rendelésadatok nyomon követését és feldolgozását.",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.0.1",
     "@prisma/client": "^6.12.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.0",

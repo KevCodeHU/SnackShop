@@ -12,3 +12,39 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Felhasznalo {
+  id        Int        @id @default(autoincrement())
+  felhasznaloNev String    @unique
+  email      String      @unique
+  jelszo     String
+  adminE     Boolean   @default(false)
+  rendelesek Rendeles[]
+}
+
+model Termek {
+  id        Int           @id @default(autoincrement())
+  nev       String
+  ar        Float
+  keszlet   Int
+  tetelek   RendelesTetel[]
+}
+
+model Rendeles {
+  id         Int              @id @default(autoincrement())
+  letrehozva DateTime         @default(now())
+  felhasznalo Felhasznalo     @relation(fields: [felhasznaloId], references: [id])
+  felhasznaloId Int
+  tetelek    RendelesTetel[]
+  osszeg     Float
+}
+
+model RendelesTetel {
+  id          Int      @id @default(autoincrement())
+  rendeles    Rendeles @relation(fields: [rendelesId], references: [id])
+  rendelesId  Int
+  termek      Termek   @relation(fields: [termekId], references: [id])
+  termekId    Int
+  mennyiseg   Int
+  ar          Float
+}
