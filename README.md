@@ -3,6 +3,17 @@
 Ez egy teljes stack webalkalmazás, ahol felhasználók snackeket rendelhetnek, az admin pedig termékeket és rendeléseket kezelhet.  
 A projekt a 2025. júliusi full-stack próbafeladat alapján készült.
 
+## ⚙️ Telepítés
+
+### Backend
+```bash
+cd backend
+npm install
+npx prisma generate
+npx prisma migrate dev --name init
+node src/server.js
+```
+
 ## 🛠 Tech stack
 
 ### Frontend
@@ -25,27 +36,6 @@ A projekt a 2025. júliusi full-stack próbafeladat alapján készült.
 ### Indoklás: Miért MySQL?
 A projektben MySQL-t választottam az adatbáziskezeléshez, mivel ez a technológia már jól ismert számomra, így a fókuszt az üzleti logika megvalósítására és a REST API kialakítására tudtam helyezni. MySQL egy iparági szabvány, széles körben támogatott és skálázható, így hosszú távon is stabil választás.
 A megvalósítás során az adatbázis absztrakciót úgy építem fel (Prisma segítségével), hogy később könnyen átállítható legyen más SQL-alapú adatbázisra is.
-
-## 📁 Projektstruktúra
-/frontend -> React alkalmazás
-/backend -> Node.js alapú API szerver
-    /prisma
-        client.js
-        schema.prisma
-    /src
-        /controllers
-            felhasznaloController.js
-            rendelesController.js
-            termekController.js
-        /routes
-            felhasznaloRoutes.js
-            rendelesRoutes.js
-            termekRoutes.js
-        server.js
-    .env
-    db-setup.sql
-/sreenshots -> UI képernyőfotók
-README.md -> Projekt dokumentáció (jelenleg ezt olvassa)
 
 ## 🔐 Authentikáció
 - Regisztráció: új felhasználók (admin fiók fixen van)

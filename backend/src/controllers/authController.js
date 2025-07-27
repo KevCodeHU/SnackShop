@@ -52,7 +52,7 @@ export const login = async (request, reply) => {
     }
 
     reply.setCookie('userId', user.id, { path: '/', httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production', });
-    reply.send({ authenticated: true, message: 'Sikeres bejelentkezés', userId: user.id, isAdmin: user.adminE });
+    reply.send({ authenticated: true, message: 'Sikeres bejelentkezés', userId: user.id, felhasznaloNev: user.felhasznaloNev, isAdmin: user.adminE });
   } catch (err) {
     reply.code(500).send({ authenticated: false, error: 'Bejelentkezési hiba', message: err.message });
   }

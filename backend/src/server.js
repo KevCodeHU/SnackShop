@@ -8,7 +8,7 @@ import { createAdminIfNotExists } from './createAdmin.js';
 dotenv.config();
 await createAdminIfNotExists();
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger: false });
 const PORT = process.env.PORT || 3002;  //.env portszám: 3001
 
 

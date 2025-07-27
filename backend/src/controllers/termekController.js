@@ -1,12 +1,10 @@
 import prisma from '../../prisma/client.js';
 
 export const listazTermek = async (request, reply) => {
-  try {
-    const termekek = await prisma.termek.findMany();
-    reply.send(termekek);
-  } catch (err) {
-    reply.code(500).send({ error: 'Hiba a termékek lekérésekor', message: err.message });
-  }
+  const termekek = await prisma.termek.findMany({
+    where: { torolt: false },
+  });
+  reply.send(termekek);
 };
 
 export const letrehozTermek = async (request, reply) => {
@@ -29,6 +27,16 @@ export const letrehozTermek = async (request, reply) => {
       });
 
       reply.code(201).send(ujTermek);
+    } else if (letezoTermek.torolt) {
+      const visszahozott = await prisma.termek.update({
+        where: { id: letezoTermek.id },
+        data: {
+          torolt: false,
+          ar: parseFloat(ar),
+          keszlet: parseInt(keszlet)
+        }
+      });
+      reply.code(200).send(visszahozott);
     } else {
       return reply.code(409).send({ error: 'Hiba a termék létrehozásakor', message: 'A megadott terméknév már létezik!' })
     }
@@ -60,10 +68,11 @@ export const torolTermek = async (request, reply) => {
   const { id } = request.params;
 
   try {
-    await prisma.termek.delete({
+    await prisma.termek.update({
       where: { id: parseInt(id) },
+      data: { torolt: true },
     });
-    reply.send({ message: 'Termék sikeresen törölve' });
+    reply.send({ message: 'Termék törölve (soft delete)' });
   } catch (err) {
     reply.code(500).send({ error: 'Hiba a termék törlésekor', message: err.message });
   }

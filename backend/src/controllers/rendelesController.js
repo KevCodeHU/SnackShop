@@ -13,6 +13,9 @@ export const leadRendeles = async (request, reply) => {
   }
 
   try {
+    const rendelesTetelek = [];
+    let total = 0;
+
     for (const item of items) {
       const termek = await prisma.termek.findUnique({ where: { id: item.termekId } });
 
@@ -23,22 +26,30 @@ export const leadRendeles = async (request, reply) => {
         });
       }
 
-      if (termek.keszlet == 0) {
+      if (termek.keszlet === 0) {
         return reply.code(409).send({
           error: 'A termék elfogyott',
-          message: `Sajnáljuk a(z) "${termek.nev}" jelenleg kifogyott a készletből.`
+          message: `Sajnáljuk, a(z) "${termek.nev}" jelenleg kifogyott a készletből.`
         });
       }
 
-      if (item.mennyiseg > termek.keszlet && termek.keszlet != 0) {
+      if (item.mennyiseg > termek.keszlet) {
         return reply.code(409).send({
           error: 'Nincs elég készlet',
           message: `A(z) "${termek.nev}" termékből csak ${termek.keszlet} db elérhető.`
         });
       }
-    }
 
-    const total = items.reduce((sum, item) => sum + item.ar * item.mennyiseg, 0);
+      const ossz = termek.ar * item.mennyiseg;
+      total += ossz;
+
+      rendelesTetelek.push({
+        termekId: termek.id,
+        mennyiseg: item.mennyiseg,
+        ar: termek.ar,
+        ossz
+      });
+    }
 
     const rendeles = await prisma.$transaction(async (tx) => {
       const ujRendeles = await tx.rendeles.create({
@@ -46,23 +57,34 @@ export const leadRendeles = async (request, reply) => {
           felhasznaloId: userId,
           osszeg: total,
           tetelek: {
-            create: items.map((item) => ({
-              termekId: item.termekId,
-              mennyiseg: item.mennyiseg,
-              ar: item.ar,
-            })),
+            create: rendelesTetelek,
           },
         },
         include: {
-          tetelek: true,
+          tetelek: {
+            include: {
+
+              termek: {
+                select: {
+                  nev: true,
+                },
+              },
+            },
+          },
+          
+          felhasznalo: {
+            select: {
+              felhasznaloNev: true,
+            },
+          },
         },
       });
 
-      for (const item of items) {
+      for (const tetel of rendelesTetelek) {
         await tx.termek.update({
-          where: { id: item.termekId },
+          where: { id: tetel.termekId },
           data: {
-            keszlet: { decrement: item.mennyiseg },
+            keszlet: { decrement: tetel.mennyiseg },
           },
         });
       }
@@ -70,7 +92,22 @@ export const leadRendeles = async (request, reply) => {
       return ujRendeles;
     });
 
-    reply.code(201).send({ message: 'Rendelés sikeresen leadva', rendeles });
+    const valasz = {
+      message: 'Rendelés sikeresen leadva',
+      rendeles: {
+        osszeg: rendeles.osszeg,
+        rendelonev: rendeles.felhasznalo.felhasznaloNev,
+        tetelek: rendeles.tetelek.map(tetel => ({
+          nev: tetel.termek.nev,
+          mennyiseg: tetel.mennyiseg,
+          mennyisegAr: tetel.ar,
+          ossz: tetel.ossz
+        }))
+      }
+    };
+
+    reply.code(201).send(valasz);
+    console.log('✅ Leadott rendelés:', JSON.stringify(valasz, null, 2));
   } catch (err) {
     reply.code(500).send({ error: 'Rendelés sikertelen', message: err.message });
   }

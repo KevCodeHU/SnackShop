@@ -28,6 +28,7 @@ model Termek {
   ar        Float
   keszlet   Int
   tetelek   RendelesTetel[]
+  torolt    Boolean       @default(false)
 }
 
 model Rendeles {
@@ -47,4 +48,5 @@ model RendelesTetel {
   termekId    Int
   mennyiseg   Int
   ar          Float
+  ossz     Float 
 }
